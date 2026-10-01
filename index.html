@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SHINKANZEN - 第1課 (文の組み立て)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body {
+            background: linear-gradient(rgba(255, 245, 247, 0.7), rgba(240, 220, 225, 0.8)),
+                        url('https://images.unsplash.com/photo-1522383225653-ed111181a951?q=80&w=1200&auto=format&fit=crop') center/cover no-repeat fixed;
+            min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 12px; overflow-x: hidden;
+        }
+        .sakura-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+        .petal {
+            position: absolute; background: #ffb7c5; border-radius: 15px 0 15px 0; opacity: 0.75;
+            filter: drop-shadow(0 2px 4px rgba(216, 90, 127, 0.2)); animation: fall linear infinite;
+        }
+        @keyframes fall {
+            0% { transform: translate(0, -10px) rotate(0deg); opacity: 0.8; }
+            100% { transform: translate(80px, 105vh) rotate(360deg); opacity: 0; }
+        }
+        .app-card {
+            position: relative; z-index: 2; background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px); width: 100%; max-width: 500px; border-radius: 20px; padding: 20px 16px;
+            border: 1.5px solid rgba(255, 255, 255, 0.9); box-shadow: 0 10px 30px rgba(180, 100, 120, 0.15); margin-top: 10px; margin-bottom: 20px;
+        }
+        .main-title {
+            text-align: center; color: #d85a7f; font-size: 20px; font-weight: 700; margin-bottom: 14px;
+            padding-bottom: 8px; border-bottom: 2px dashed #f2d5db;
+        }
+        .header { display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; color: #b06d7e; margin-bottom: 12px; }
+        .question-card { background: #fff5f7; border-left: 4px solid #d85a7f; padding: 16px; border-radius: 12px; margin-bottom: 16px; }
+        .q-num { font-size: 12px; font-weight: 700; color: #d85a7f; margin-bottom: 6px; }
+        .q-text { font-size: 17px; font-weight: 700; color: #3a2e30; line-height: 1.8; word-break: break-word; }
+        .blank-space { letter-spacing: 2px; padding: 0 4px; font-weight: 700; color: #d85a7f; }
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .opt-btn {
+            display: flex; align-items: center; justify-content: center; background: #ffffff; border: 1.5px solid #f2d5db; color: #4a383b;
+            padding: 14px; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; text-align: center; line-height: 1.3;
+        }
+        .opt-btn:active { background: #fff0f3; border-color: #d85a7f; }
+        .opt-btn.correct { background: #e8f5e9 !important; border-color: #66bb6a !important; color: #2e7d32 !important; }
+        .opt-btn.wrong { background: #ffebee !important; border-color: #ef5350 !important; color: #c62828 !important; }
+        .explanation-box { background: #ffffff; border: 1px dashed #d85a7f; border-radius: 12px; padding: 12px; margin-top: 12px; }
+        .exp-title { font-size: 11px; font-weight: 700; color: #d85a7f; text-transform: uppercase; margin-bottom: 4px; }
+        .exp-full { font-size: 15px; font-weight: 700; color: #3a2e30; margin-bottom: 6px; line-height: 1.5; }
+        .exp-trans { font-size: 13px; color: #555; line-height: 1.4; }
+        .feedback { display: none; margin-top: 14px; }
+        .next-btn {
+            display: block; width: 100%; margin-top: 12px; background: linear-gradient(135deg, #e07a9e 0%, #d85a7f 100%);
+            color: white; border: none; padding: 14px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="sakura-container" id="sakura-box"></div>
+    <div class="app-card">
+        <div class="main-title">🌸 SHINKANZEN - 第1課 (文の組み立て)</div>
+        <div class="header">
+            <span id="q-count">Câu 1 / 10</span>
+            <span id="score-count">Điểm: 0</span>
+        </div>
+        <div class="question-card">
+            <div class="q-num" id="q-num">Câu 1</div>
+            <div class="q-text" id="q-text"></div>
+        </div>
+        <div class="options-grid" id="options-box"></div>
+        <div class="feedback" id="feedback">
+            <div id="result-status" style="font-weight: 700; text-align: center; font-size: 15px; margin-bottom: 10px;"></div>
+            <div class="explanation-box">
+                <div class="exp-title">📌 Câu hoàn chỉnh & Thứ tự:</div>
+                <div class="exp-full" id="exp-full"></div>
+                <div class="exp-title">🌸 Dịch nghĩa câu:</div>
+                <div class="exp-trans" id="exp-trans"></div>
+            </div>
+            <button class="next-btn" onclick="nextQuestion()">Câu tiếp theo ➔</button>
+        </div>
+    </div>
+    <script>
+        function createPetal() {
+            const box = document.getElementById('sakura-box');
+            if(!box) return;
+            const p = document.createElement('div');
+            p.classList.add('petal');
+            p.style.width = Math.random() * 6 + 6 + 'px';
+            p.style.height = Math.random() * 8 + 8 + 'px';
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.animationDuration = Math.random() * 3 + 5 + 's';
+            box.appendChild(p);
+            setTimeout(() => p.remove(), 8000);
+        }
+        setInterval(createPetal, 500);
+
+        const quizData = [
+            {
+                id: 1,
+                text: "今度の旅行について <span class='blank-space'>____</span> <span class='blank-space'>____</span> ★ <span class='blank-space'>____</span> お返事をください。",
+                options: ["1. 計画で", "2. このような", "3. どうか", "4. いいか"],
+                correct: 3,
+                full: "今度の旅行について <u>このような</u> <u>計画で</u> <u><b>いいか</b></u> <u>どうか</u> お返事をください。\n(Thứ tự: 2 - 1 - 4 - 3)",
+                trans: "Về chuyến du lịch sắp tới, xin hãy trả lời cho tôi biết liệu kế hoạch như thế này có ổn hay không."
+            },
+            {
+                id: 2,
+                text: "危ないから <span class='blank-space'>____</span> <span class='blank-space'>____</span> ★ <span class='blank-space'>____</span> 子どもたちに注意した。",
+                options: ["1. 並んで", "2. 横に", "3. ように", "4. 歩かない"],
+                correct: 3,
+                full: "危ないから <u>横に</u> <u>並んで</u> <u><b>歩かない</b></u> <u>ように</u> 子どもたちに注意した。\n(Thứ tự: 2 - 1 - 4 - 3)",
+                trans: "Vì nguy hiểm nên tôi đã nhắc nhở bọn trẻ không nên đi sóng hàng ngang."
+            },
+            {
+                id: 3,
+                text: "どうすれば入りたい <span class='blank-space'>____</span> <span class='blank-space'>____</span> ★ <span class='blank-space'>____</span> 聞いてみたい。",
+                options: ["1. 会社に", "2. 先輩に", "3. 入れる", "4. か"],
+                correct: 3,
+                full: "どうすれば入りたい <u>会社に</u> <u>入れる</u> <u><b>か</b></u> <u>先輩に</u> 聞いてみたい。\n(Thứ tự: 1 - 3 - 4 - 2)",
+                trans: "Tôi muốn thử hỏi các tiền bối xem làm thế nào thì mới có thể vào được công ty mà mình mong muốn."
+            },
+            {
+                id: 4,
+                text: "今年こそ <span class='blank-space'>____</span> <span class='blank-space'>____</span> ★ <span class='blank-space'>____</span> と思う。",
+                options: ["1. 行きたかった", "2. 行こう", "3. ヨーロッパに", "4. 前から"],
+                correct: 2,
+                full: "今年こそ <u>前から</u> <u>行きたかった</u> <u><b>ヨーロッパに</b></u> <u>行こう</u> と思う。\n(Thứ tự: 4 - 1 - 3 - 2)",
+                trans: "Chính năm nay tôi định nhất định sẽ đi châu Âu - nơi mà tôi đã muốn đi từ trước đây."
+            },
+            {
+                id: 5,
+                text: "リンさんは、自分がアルバイトで <span class='blank-space'>____</span> <span class='blank-space'>____</span> ★ <span class='blank-space'>____</span> と言った。",
+                options: ["1. 食べに", "2. 働いている", "3. 来てほしい", "4. 店に"],
+                correct: 0,
+                full: "リンさんは、自分がアルバイトで <u>働いている</u> <u>店に</u> <u><b>食べに</b></u> <u>来てほしい</u> と言った。\n(Thứ tự: 2 - 4 - 1 - 3)",
+                trans: "Rin đã nói rằng muốn mọi người đến ăn tại cửa hàng mà cô ấy đang làm thêm."
+            },
+            {
+                id: 6,
+                text: "先生に授業中は <span class='blank-space'>____</span> <span class='blank-space'>____</span> ★ <span class='blank-space'>____</span> どうしても寝てしまう。",
+                options: ["1. と", "2. 言われても", "3. 寝るな", "4. つまらないと"],
+                correct: 1,
+                full: "先生に授業中は <u>寝るな</u> <u>と</u> <u><b>言われても</b></u> <u>つまらないと</u> どうしても寝てしまう。\n(Thứ tự: 3 - 1 - 2 - 4)",
+                trans: "Dù bị thầy giáo bảo 'Đừng ngủ trong giờ học', nhưng hễ tiết học chán là kiểu gì tôi cũng trót ngủ mất."
+            },
+            {
+                id: 7,
+                text: "山田さんに <span class='blank-space'>____</span> <span class='blank-space'>____</span> ★ <span class='blank-space'>____</span> と聞かれた。",
+                options: ["1. ほしいの", "2. どれか", "3. いちばん", "4. は"],
+                correct: 3,
+                full: "山田さんに <u>いちばん</u> <u>どれか</u> <u><b>は</b></u> <u>ほしいの</u> と聞かれた。\n(Thứ tự: 3 - 2 - 4 - 1)",
+                trans: "Tôi được anh Yamada hỏi xem cái nào là cái tôi muốn nhất."
+            },
+            {
+                id: 8,
+                text: "どうして <span class='blank-space'>____</span> <span class='blank-space'>____</span> ★ <span class='blank-space'>____</span> やり方を間違えていたからだ。",
+                options: ["1. というと", "2. ように", "3. 言われたか", "4. やり直す"],
+                correct: 2,
+                full: "どうして <u>やり直す</u> <u>ように</u> <u><b>言われたか</b></u> <u>というと</u> やり方を間違えていたからだ。\n(Thứ tự: 4 - 2 - 3 - 1)",
+                trans: "Nếu hỏi tại sao tôi lại bị bảo phải làm lại, thì đó là vì tôi đã làm sai cách."
+            },
+            {
+                id: 9,
+                text: "店長に <span class='blank-space'>____</span> <span class='blank-space'>____</span> ★ <span class='blank-space'>____</span> と言われた。",
+                options: ["1. 言え", "2. そう", "3. 休みたい", "4. なら"],
+                correct: 0,
+                full: "店長に <u>そう</u> <u>なら</u> <u><b>言え</b></u> <u>休みたい</u> と言われた。\n(Thứ tự: 2 - 4 - 1 - 3)",
+                trans: "Tôi bị quản lý bảo 'Nếu đã như thế thì hãy nói là muốn nghỉ đi'."
+            },
+            {
+                id: 10,
+                text: "いつごろからこの言葉が <span class='blank-space'>____</span> <span class='blank-space'>____</span> ★ <span class='blank-space'>____</span> 調べてみた。",
+                options: ["1. なった", "2. 使われる", "3. か", "4. ように"],
+                correct: 0,
+                full: "いつごろからこの言葉が <u>使われる</u> <u>ように</u> <u><b>なった</b></u> <u>か</u> 調べてみた。\n(Thứ tự: 2 - 4 - 1 - 3)",
+                trans: "Tôi đã thử tìm hiểu xem từ ngữ này bắt đầu được sử dụng từ khoảng thời gian nào."
+            }
+        ];
+
+        let currentIndex = 0;
+        let score = 0;
+        let canInteract = true;
+
+        function loadQuestion() {
+            canInteract = true;
+            document.getElementById('feedback').style.display = 'none';
+            const item = quizData[currentIndex];
+
+            document.getElementById('q-count').innerText = `Câu ${currentIndex + 1} / ${quizData.length}`;
+            document.getElementById('score-count').innerText = `Điểm: ${score}`;
+            document.getElementById('q-num').innerText = `Câu ${item.id}`;
+            document.getElementById('q-text').innerHTML = item.text;
+
+            const optionsBox = document.getElementById('options-box');
+            optionsBox.innerHTML = '';
+
+            item.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'opt-btn';
+                btn.innerText = opt;
+                btn.onclick = () => checkAnswer(btn, idx);
+                optionsBox.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(btn, selectedIdx) {
+            if(!canInteract) return;
+            canInteract = false;
+
+            const item = quizData[currentIndex];
+            const statusEl = document.getElementById('result-status');
+
+            if(selectedIdx === item.correct) {
+                btn.classList.add('correct');
+                score += 10;
+                statusEl.innerHTML = `<span style="color: #4caf50;">✓ 正解 (Chính xác!)</span>`;
+            } else {
+                btn.classList.add('wrong');
+                statusEl.innerHTML = `<span style="color: #ef5350;">✕ ざんねん (Đáp án đúng: ${item.options[item.correct]})</span>`;
+            }
+
+            document.getElementById('exp-full').innerHTML = item.full.replace(/\n/g, '<br>');
+            document.getElementById('exp-trans').innerText = item.trans;
+            document.getElementById('score-count').innerText = `Điểm: ${score}`;
+            document.getElementById('feedback').style.display = 'block';
+        }
+
+        function nextQuestion() {
+            currentIndex = (currentIndex + 1) % quizData.length;
+            loadQuestion();
+        }
+
+        loadQuestion();
+    </script>
+</body>
+</html>
